@@ -2,6 +2,7 @@
 Practice for basic network programming in c
 
 2018.08.01
+
 You can build and test client and server programs.
 1. Open at least two console windows.
 2. Build the program
