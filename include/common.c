@@ -6,7 +6,7 @@ int npp_chfd_nonblocking(int fd) {
 	if((opts = fcntl(fd, F_GETFL)) < 0) {
 		/* TODO : change error print to npp_error */
 		printf("%s %s\n", "NPP2003", NPP0002);
-		npp_error = NPP_ESYSTEM;
+		npperrno = NPP_ESYSTEM;
 		return NPP_ERROR;
 	}
 
@@ -14,7 +14,7 @@ int npp_chfd_nonblocking(int fd) {
 	if(fcntl(fd, opts, F_SETFL) < 0) {
 		/* TODO : change error print to npp_error */
 		printf("%s %s\n", "NPP2004", NPP0002);
-		npp_error = NPP_ESYSTEM;
+		npperrno = NPP_ESYSTEM;
 		return NPP_ERROR;
 	}
 

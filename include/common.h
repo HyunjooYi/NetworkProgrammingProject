@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include "npc_err.h"
+#include <errno.h>
 #include "errors.h"
 
 /* definitions */
@@ -21,6 +21,6 @@ extern int npperrno;
 
 /* functions */
 void npp_error(int level, char *errnum);
-void npp_chfd_nonblocking(int fd);
+int npp_chfd_nonblocking(int fd);
 
 #endif

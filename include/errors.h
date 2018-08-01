@@ -5,7 +5,8 @@
 #define NPP0001 "Memory allocation failed"
 #define NPP0002 "fcntl falled"
 #define NPP0003 "write failed"
-#define NPP0004 "select failed"
+#define NPP0004 "read failed"
+#define NPP0005 "select failed"
 
 /* 100~999 : client error */
 #define NPP0100 "socket of client failed"

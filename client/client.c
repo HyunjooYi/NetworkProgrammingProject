@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "usrinc.h"
+#include "../usrinc/usrinc.h"
 
 int main(int argc, char *argv[]) {
-	int client_fd, flags, readn, len;
+	int conn, flags, readn, len;
 	char send_data[BUF_SIZE], recv_data[BUF_SIZE];
 
 	if(argc != 2) {
@@ -13,12 +13,13 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* TODO: change flags to flags |= NPP_NO_FLAGS; */
-	flsgs = 0;
-	if((conn = nppc_open_conn(flags)) != NPP_OK) {
+	flags = 0;
+	if((conn = nppc_open_conn(flags)) < 0) {
 		printf("failed to get connection : npperrno[%d]\n", npperrno);
 		return -1;
 	}
 
+	printf("successfully got a connection\n");
 	strcpy(send_data, argv[1]);
 	len = BUF_SIZE;
 	/* TODO : seperate all used flags in this file */
@@ -28,7 +29,7 @@ int main(int argc, char *argv[]) {
 	}
 	printf("successfully send msg[%s] to server\n", send_data);
 
-	if(nppc_recv_msg(conn, &recv_data, &len, flags) < 0) {
+	if(nppc_recv_msg(conn, (char **)&recv_data, &len, flags) < 0) {
 		printf("failed to recv msg from server : npperrno[%d]\n", npperrno);
 		return -1;
 	}
