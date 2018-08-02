@@ -1,14 +1,12 @@
-client : client.o client_conn.o ../include/common.o
-	gcc -o client client.o client_conn.o ../include/common.o
+CC = gcc
+CFLAGS = -W -Wall
+TARGET = client
+OBJECTS = client.o client_conn.o ../include/common.o
 
-client.o : client.c
-	gcc -c -o client.o client.c
+all : $(TARGET)
 
-client_conn.o : client_conn.c
-	gcc -c -o client_conn.o client_conn.c
-
-common.o : ../include/common.c
-	gcc -c -o ../include/common.o ../include/common.c
+$(TARGET) : $(OBJECTS)
+	$(CC) $(CFLAGS) -o $@ $^
 
 clean :
 	rm *.o client

@@ -1,63 +1,38 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/select.h>
-#include <fcntl.h>
-#include <errno.h>
-#define PORT 1234
-#define BUF_SIZE 1024
+#include "server.h"
 
-void nonblock(int client_fd) {
-	int opts;
-	opts = fcntl(client_fd, F_GETFL);
-	if(opts < 0) {
-		printf("fcntl(F_GETFL) error\n");
-		exit(0);
-	}
-	opts = (opts | O_NONBLOCK);
-	if(fcntl(client_fd, F_SETFL, opts) < 0) {
-		printf("fcntl(F_SETFL) error\n");
-		exit(0);
-	}
+void init() {
+	FD_ZERO(&readfds);
+	FD_ZERO(&allfds);
+	listen_fd = INITFD;
+	client_fd = INITFD;
+	maxfd = INITFD;
 }
 
 int main (void) {
-	struct sockaddr_in server_addr, client_addr;
-	int listen_fd, client_fd, len, i, size;
+	// 1. init args in server/socket
+	init();
+
+	// 2. make socket & fd_set
+	listen_fd = init_listen_fd();
+	maxfd = listen_fd;
+
+	// 3. loop
+	loop();
+
+	// 4. close listen fd
+	close(listen_fd);
+
+	return 0;
+}
+
+void loop() {
+	fd_set allfds;
+	struct sockaddr_in client_addr;
+	int len, i, readn, n;
 	char recv_data[BUF_SIZE], send_data[BUF_SIZE];
+
 	memset(&send_data, 0x00, BUF_SIZE);
 	memset(&recv_data, 0x00, BUF_SIZE);
-	int readn;
-	int maxfd;
-	int n;
-	fd_set readfds, allfds;
-
-	if((listen_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-		printf("error cannnot open server\n");
-		exit(0);
-	}
-
-	memset(&server_addr, 0x00, sizeof(server_addr));
-	server_addr.sin_family = PF_INET;
-	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	server_addr.sin_port = htons(PORT);
-
-	if(bind(listen_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-		printf("error cannot bind local address\n");
-		exit(0);
-	}
-
-	if(listen(listen_fd, 5) < 0) {
-		printf("error cannot listen connection\n");
-		exit(0);
-	}
-
-	FD_ZERO(&readfds);
-	FD_SET(listen_fd, &readfds);
-	maxfd = listen_fd;
 
 	while(1) {
 		allfds = readfds;
@@ -67,12 +42,17 @@ int main (void) {
 				len = sizeof(client_addr);
 				client_fd = accept(listen_fd, (struct sockaddr *)&client_addr, (socklen_t *)&len);
 				if(client_fd < 0) {
-					printf("error cannot accept client\n");
-					exit(0);
+					printf("[%s] %s\n", "NPP2012", NPP1003);
+					npperrno = NPP_ESYSTEM;
+					return;
 				}
 
 				FD_SET(client_fd, &readfds);
-				nonblock(client_fd);
+				if(npp_chfd_nonblocking(client_fd) < 0) {
+					printf("[%s] %s\n", "NPP2013", NPP0002);
+					npperrno = NPP_ESYSTEM;
+					return;
+				}
 				if(client_fd > maxfd)
 					maxfd = client_fd;
 				printf("Accepted\n");
@@ -96,16 +76,44 @@ int main (void) {
 					printf("client closed\n");
 				} else if (readn == -1) {
 					if(errno != EAGAIN) {
-						close(client_fd);
-						FD_CLR(client_fd, &readfds);
-						printf("client closed\n");
+						printf("[%s] %s\n", "NPP2014", NPP0004);
+						npperrno = NPP_ESYSTEM;
+						return;
 					}
 				}
 			}
 		}
 	}
+}
 
-	close(listen_fd);
+int init_listen_fd() {
+	struct sockaddr_in server_addr;
+	int fd;
 
-	return 0;
+	if((fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
+		printf("[%s] %s\n", "NPP2009", NPP1000);
+		npperrno = NPP_ESYSTEM;
+		return NPP_ERROR;
+	}
+
+	memset(&server_addr, 0x00, sizeof(server_addr));
+	server_addr.sin_family = PF_INET;
+	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	server_addr.sin_port = htons(PORT);
+
+	if(bind(fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+		printf("[%s] %s\n", "NPP2010", NPP1001);
+		npperrno = NPP_ESYSTEM;
+		return NPP_ERROR;
+	}
+
+	if(listen(fd, 5) < 0) {
+		printf("[%s] %s\n", "NPP2011", NPP1002);
+		npperrno = NPP_ESYSTEM;
+		return NPP_ERROR;
+	}
+
+	FD_SET(fd, &readfds);
+
+	return fd;
 }

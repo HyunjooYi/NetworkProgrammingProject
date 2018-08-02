@@ -1,7 +1,7 @@
 #include "client_conn.h"
 
 int nppc_recv_msg(int conn, char **_recv_msg, int *len, int flags) {
-	int readn, left, n, offset, tmp_len;
+	int readn, left, offset, tmp_len;
 	int phase = 0;
 	struct timeval time;
 	char recv_msg[BUF_SIZE];
@@ -42,7 +42,7 @@ int nppc_recv_msg(int conn, char **_recv_msg, int *len, int flags) {
 }
 
 int nppc_send_msg(int conn, char *send_buf, int len, int flags) {
-	int writen, left, n, offset;
+	int writen, left, offset;
 	int phase = 0;
 	struct timeval time;
 

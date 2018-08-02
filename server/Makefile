@@ -1,8 +1,12 @@
-server : server.o
-	gcc -o server server.o
+CC = gcc
+CFLAGS = -W -Wall
+TARGET = server
+OBJECTS = server.o ../include/common.o
 
-server.o : server.c
-	gcc -c -o server.o server.c
+all : $(TARGET)
+
+$(TARGET) : $(OBJECTS)
+	$(CC) $(CFLAGS) -o $@ $^
 
 clean :
 	rm *.o server

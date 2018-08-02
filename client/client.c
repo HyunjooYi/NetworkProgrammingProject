@@ -4,7 +4,7 @@
 #include "../usrinc/usrinc.h"
 
 int main(int argc, char *argv[]) {
-	int conn, flags, readn, len;
+	int conn, flags, len;
 	char send_data[BUF_SIZE], recv_data[BUF_SIZE];
 
 	if(argc != 2) {
