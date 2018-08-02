@@ -28,7 +28,7 @@ You can build and test client and server programs.
   
     3.2 Console 2: Type './client [lowercase text]' and press Enter.
   
-    Ex) ./client test
+        Ex) ./client test
     
 4. Check the results.
 5. Console 1: Press 'ctrl + c' to exit the server program.
