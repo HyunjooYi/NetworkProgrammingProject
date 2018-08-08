@@ -15,31 +15,24 @@ int main(int argc, char *argv[]) {
 	/* TODO: change flags to flags |= NPP_NO_FLAGS; */
 	flags = 0;
 	if((conn = nppc_open_conn(flags)) < 0) {
-		printf("failed to get connection : npperrno[%d]\n", npperrno);
+		printf("failed to get connection : npperrno[%d] : %s\n", npperrno, npp_str_err(npperrno));
 		return -1;
 	}
-
 	printf("successfully got a connection\n");
 	strcpy(send_data, argv[1]);
 	len = BUF_SIZE;
-	/* TODO : seperate all used flags in this file */
-	if(nppc_send_msg(conn, send_data, len, flags) < 0) {
-		printf("failed to send msg to server : npperrno[%d]", npperrno);
-		return -1;
-	}
-	printf("successfully send msg[%s] to server\n", send_data);
 
-	if(nppc_recv_msg(conn, (char **)&recv_data, &len, flags) < 0) {
-		printf("failed to recv msg from server : npperrno[%d]\n", npperrno);
+	if(npp_svccall(conn, "TOUPPER", send_data, len, (char **) &recv_data, &len, flags) < 0) {
+		printf("failed to call svc[%s] according to %d[%s]\n", "TOUPPER", npperrno, npp_str_err(npperrno));
 		return -1;
 	}
-	printf("successfully recv msg[%s] from server\n", recv_data);
+	printf("successfully send[%s] and recv[%s] data\n", send_data, recv_data);
 
 	if(nppc_close_conn(conn, flags) < 0) {
-		printf("failed to close connection[%d]\n", conn);
+		printf("failed to close connection id:[%d]\n", conn);
 		return -1;
 	}
-	printf("successfully close connection[%d]\n", conn);
+	printf("successfully close connection id:[%d]\n", conn);
 
 	return 0;
 }

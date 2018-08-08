@@ -1,17 +1,25 @@
 #include "client_conn.h"
 
-int nppc_recv_msg(int conn, char **_recv_msg, int *len, int flags) {
+int nppc_recv_msg(header_t **hp) {
 	int readn, left, offset, tmp_len;
 	int phase = 0;
 	struct timeval time;
 	char recv_msg[BUF_SIZE];
+	header_t *hp2;
 
+	hp2 = *hp;
 	time.tv_sec = 1;
 	time.tv_usec = 0;
 	left = tmp_len = *len = BUF_SIZE; /* TODO : ***** 읽어올 길이를 header를 통해서 미리 알아야 한다. 지금은 그냥 고정 버퍼 길이로 테스트 겸 해봄 ****** */
 	offset = 0;
 	
 	while(1) {
+		/* TODO */
+		/* 1. read header */
+		/* 2. recv real data */
+		/* 2-1. if more space for recived data is needed, then realloc hp2 */
+		/* 2-2. recv all data */
+		/* 3. end */
 		if((readn = read(conn, recv_msg + offset, left)) < 0) {
 			printf("[%s] %s\n", "NPP2008", NPP0004);
 			npperrno = NPP_ESYSTEM;
@@ -41,18 +49,20 @@ int nppc_recv_msg(int conn, char **_recv_msg, int *len, int flags) {
 	return NPP_OK;
 }
 
-int nppc_send_msg(int conn, char *send_buf, int len, int flags) {
+int nppc_send_msg(header_t *hp) {
 	int writen, left, offset;
 	int phase = 0;
+	int conn = hp->conn;
+	char *sndbuf = hp + sizeof(header_t);
 	struct timeval time;
 
 	time.tv_sec = 1;
 	time.tv_usec = 0;
 
-	left = len;
+	left = len = hp->asize;
 	offset = 0;
 	while(1) {
-		if((writen = write(conn, send_buf+offset, left)) < 0) {
+		if((writen = write(conn, sndbuf+offset, left)) < 0) {
 			printf("[%s] %s\n", "NPP2005", NPP0003);
 			npperrno = NPP_ESYSTEM;
 			return NPP_ERROR;

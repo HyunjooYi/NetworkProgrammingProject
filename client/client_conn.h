@@ -19,7 +19,7 @@ fd_set readfds;
 /* functions */
 int nppc_open_conn(int flags);
 int nppc_close_conn(int conn, int flags);
-int nppc_send_msg(int conn, char *send_buf, int len, int flags);
-int nppc_recv_msg(int conn, char **recv_buf, int *len, int flags);
+int nppc_send_msg(header_t *hp);
+int nppc_recv_msg(header_t **hp);
 
 #endif
