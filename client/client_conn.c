@@ -1,32 +1,41 @@
 #include "client_conn.h"
 
 int nppc_recv_msg(header_t **hp) {
-	int readn, left, offset, tmp_len;
+	int readn, left, offset;
 	int phase = 0;
 	struct timeval time;
-	char recv_msg[BUF_SIZE];
 	header_t *hp2;
 
 	hp2 = *hp;
 	time.tv_sec = 1;
 	time.tv_usec = 0;
-	left = tmp_len = *len = BUF_SIZE; /* TODO : ***** 읽어올 길이를 header를 통해서 미리 알아야 한다. 지금은 그냥 고정 버퍼 길이로 테스트 겸 해봄 ****** */
+	left = HEADER_SIZE;
 	offset = 0;
 	
 	while(1) {
 		/* TODO */
-		/* 1. read header */
 		/* 2. recv real data */
 		/* 2-1. if more space for recived data is needed, then realloc hp2 */
 		/* 2-2. recv all data */
 		/* 3. end */
-		if((readn = read(conn, recv_msg + offset, left)) < 0) {
+		if((readn = read(conn, hp2->data + offset, left)) < 0) {
 			printf("[%s] %s\n", "NPP2008", NPP0004);
 			npperrno = NPP_ESYSTEM;
 			return NPP_ERROR;
 		}
 		if(phase == 0) {
-			left = tmp_len - readn;
+			/* 1. read header */
+			if(readn < HEADER_SIZE) {
+				left = HEADER_SIZE - readn;
+				offset = readn;
+				continue;
+				/* TODO magic number inspection */
+				printf("[%s] %s\n", "NPP2015", NPP0006);
+				npperrno = NPP_ENETWORK;
+				return NPP_ERROR;
+			}
+
+			left -= readn;
 			/* TODO : 나중에 여러 client가 붙으면 응답이 섞일 수 있음
 			 나에게로 온 응답이 아니면 unmatched_process를 태우고 끝내야 한다
 			 그때는 left가 음수일 수도 있을 것 같음 */

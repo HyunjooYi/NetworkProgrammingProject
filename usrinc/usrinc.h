@@ -10,6 +10,7 @@
 /* ----- */
 #define NPP_ESYSTEM 2 /* system call error */
 #define NPP_EMAXNO 3 /* max errno */
+#define NPP_ENETWORK 4 /* network msg errno */
 
 /* functions */
 char* npp_str_err(int _errno);
