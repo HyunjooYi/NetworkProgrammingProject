@@ -7,7 +7,6 @@
 #define NPP0003 "write failed"
 #define NPP0004 "read failed"
 #define NPP0005 "select failed"
-#define NPP0006 "magic number error"
 
 /* 100~999 : client error */
 #define NPP0100 "socket of client failed"

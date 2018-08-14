@@ -5,13 +5,13 @@ int npp_svccall(int conn, char *svcname, char *send_buffer, int sndlen, char **r
 	header_t *hp;
 	int ret;
 
-	hp = (header_t *) malloc(HEADER_SIZE + sndlen);
+	hp = (header_t *) malloc(sizeof(header_t) + sndlen);
 
 	hp->flags = flags;
 	hp->conn = conn;
 	strcpy(hp->msgtype, svcname);
 	hp->data_size = sndlen;
-	hp->asize = sndlen + HEADER_SIZE;
+	hp->asize = sndlen + sizeof(header_t);
 	memcpy(hp + sndlen, send_buffer, sndlen);
 
 	if((ret = nppc_send_msg(hp)) < 0)
