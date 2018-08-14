@@ -11,11 +11,15 @@
 #include "errors.h"
 #include "../usrinc/usrinc.h"
 
+/* definitions */
+#define HEADER_SIZE 48
+
 /* extern valiables */
 extern int npperrno;
 
 /* structs */
-/* npp header : must be 16 byte alignment (for 32, 64bit) */
+/* npp header : must be 16 byte alignment (for 32, 64bit)
+ * 48bytes */
 typedef struct header_s {
 	int magic;
 	int conn; // socket fd
